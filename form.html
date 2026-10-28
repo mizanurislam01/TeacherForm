@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particulars of Teaching Staff</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background-color: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .print-shadow-none {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+      }
+      .page-break {
+        page-break-inside: avoid;
+      }
+    }
+    
+    table td, table th {
+      border: 1px solid #4a5568;
+    }
+    
+    [contenteditable="true"]:hover {
+      background-color: #f7fafc;
+      outline: 1px dashed #4299e1;
+      border-radius: 2px;
+    }
+    
+    [contenteditable="true"]:focus {
+      background-color: #ffffff;
+      outline: 2px solid #3182ce;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans p-4 md:p-8">
+
+  <div class="max-w-5xl mx-auto">
+    <!-- Top Action Bar (Hidden in Print/PDF) -->
+    <div class="no-print bg-white p-4 rounded-xl shadow-md mb-6 flex flex-wrap gap-3 items-center justify-between border border-slate-200">
+      <div>
+        <h1 class="text-xl font-bold text-slate-800">Particulars of Teaching Staff</h1>
+        <p class="text-xs text-slate-500">Edit titles & details inline, manage records, or export to PDF / Word.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="exportToWord()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Export Word (.docx)
+        </button>
+        <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          Export PDF / Print
+        </button>
+      </div>
+    </div>
+
+    <!-- Printable Form Document Container -->
+    <div class="bg-white p-6 md:p-10 rounded-xl shadow-lg border border-slate-200 print-shadow-none">
+      <!-- Section Editable Header -->
+      <div class="mb-4">
+        <h2 id="docHeading" contenteditable="true" class="text-lg font-bold text-black font-sans leading-snug outline-none p-1 rounded">G. Particulars of teaching Staff</h2>
+        <h3 id="docSubHeading" contenteditable="true" class="text-base font-semibold text-black font-sans mt-0.5 outline-none p-1 rounded">1. Teaching in Primary / Upper Primary exclusively(details of each teacher separately)</h3>
+      </div>
+
+      <!-- Container for Dynamic Tables -->
+      <div id="staffList" class="space-y-4">
+        <!-- Dynamic teacher tables rendered here -->
+      </div>
+
+      <!-- Add Button at the bottom of the table list -->
+      <div class="no-print mt-6 border-t border-slate-200 pt-4">
+        <button onclick="openModal()" class="w-full py-3 bg-slate-50 hover:bg-blue-50 border-2 border-dashed border-slate-300 hover:border-blue-400 text-blue-600 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition group shadow-sm">
+          <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span>Add New Teacher Entry Block</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Teacher Modal -->
+  <div id="teacherModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50 no-print">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 border border-slate-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-5 pb-3 border-b">
+        <h3 class="text-lg font-bold text-slate-800">Add New Teacher Entry</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold leading-none">&times;</button>
+      </div>
+      
+      <form id="teacherForm" onsubmit="handleAddTeacher(event)" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Teacher Name</label>
+            <input type="text" id="name" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Father/Spouse Name</label>
+            <input type="text" id="father_spouse" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Date of Birth</label>
+            <input type="text" id="dob" placeholder="DD-MM-YYYY" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Academic Qualification</label>
+            <input type="text" id="acad_qual" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Professional Qualifications</label>
+            <input type="text" id="prof_qual" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Teaching Experience</label>
+            <input type="text" id="exp" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Class Assigned</label>
+            <input type="text" id="class_assigned" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Appointment Date</label>
+            <input type="text" id="appt_date" placeholder="DD-MM-YYYY" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Trained or Untrained</label>
+            <select id="trained" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="Trained">Trained</option>
+              <option value="Untrained">Untrained</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-600 hover:bg-slate-50 font-medium">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm">Save Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Data list matching sample image
+    let teachers = [
+      {
+        id: 1,
+        name: "Dipika Das",
+        father_spouse: "Dulal Ch. Das",
+        dob: "24-01-2000",
+        acad_qual: "M.A",
+        prof_qual: "B.ed",
+        exp: "",
+        class_assigned: "",
+        appt_date: "25-04-2022",
+        trained: "Trained"
+      },
+      {
+        id: 2,
+        name: "Kanchan Urang",
+        father_spouse: "Ranen Kumar Roy",
+        dob: "24-04-1991",
+        acad_qual: "B.A",
+        prof_qual: "D.El.Ed",
+        exp: "",
+        class_assigned: "",
+        appt_date: "25-04-2022",
+        trained: "Trained"
+      }
+    ];
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Render tables into UI container
+    function render() {
+      const container = document.getElementById("staffList");
+      container.innerHTML = "";
+
+      teachers.forEach((item, index) => {
+        const tableHTML = `
+          <div class="relative group page-break mb-6">
+            <button onclick="deleteTeacher(${index})" title="Delete entry" 
+                    class="no-print absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow transition z-10 opacity-80 group-hover:opacity-100">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+            
+            <table class="w-full border-collapse border border-slate-400 text-center text-sm font-sans text-slate-900 bg-white">
+              <colgroup>
+                <col style="width: 5%;">
+                <col style="width: 31.66%;">
+                <col style="width: 31.66%;">
+                <col style="width: 31.66%;">
+              </colgroup>
+              <tbody>
+                <tr>
+                  <td rowspan="6" class="align-top pt-2 font-normal border border-slate-400 text-base">${index + 1}</td>
+                  <td class="py-1 px-2 border border-slate-400 font-normal">Teacher Name</td>
+                  <td class="py-1 px-2 border border-slate-400 font-normal">Father/Spouse Name</td>
+                  <td class="py-1 px-2 border border-slate-400 font-normal">Date of Birth</td>
+                </tr>
+                <tr>
+                  <td contenteditable="true" onblur="updateField(${index}, 'name', this.innerText)" class="py-1 px-2 border border-slate-400 font-normal">${escapeHtml(item.name)}</td>
+                  <td contenteditable="true" onblur="updateField(${index}, 'father_spouse', this.innerText)" class="py-1 px-2 border border-slate-400 font-normal">${escapeHtml(item.father_spouse)}</td>
+                  <td contenteditable="true" onblur="updateField(${index}, 'dob', this.innerText)" class="py-1 px-2 border border-slate-400 font-normal">${escapeHtml(item.dob)}</td>
+                </tr>
+                <tr>
+                  <td class="py-1 px-2 border border-slate-400 font-normal">Academic Qualification</td>
+                  <td class="py-1 px-2 border border-slate-400 font-normal">Professional Qualifications</td>
+                  <td class="py-1 px-2 border border-slate-400 font-normal">Teaching Experience</td>
+                </tr>
+                <tr>
+                  <td contenteditable="true" onblur="updateField(${index}, 'acad_qual', this.innerText)" class="py-1 px-2 border border-slate-400 font-normal">${escapeHtml(item.acad_qual)}</td>
+                  <td contenteditable="true" onblur="updateField(${index}, 'prof_qual', this.innerText)" class="py-1 px-2 border border-slate-400 font-normal">${escapeHtml(item.prof_qual)}</td>
+                  <td contenteditable="true" onblur="updateField(${index}, 'exp', this.innerText)" class="py-1 px-2 border border-slate-400 font-normal">${escapeHtml(item.exp)}</td>
+                </tr>
+                <tr>
+                  <td class="py-1 px-2 border border-slate-400 font-normal">Class Assigned</td>
+                  <td class="py-1 px-2 border border-slate-400 font-normal">Appointment Date</td>
+                  <td class="py-1 px-2 border border-slate-400 font-normal">Trained or Untrained</td>
+                </tr>
+                <tr>
+                  <td contenteditable="true" onblur="updateField(${index}, 'class_assigned', this.innerText)" class="py-1 px-2 border border-slate-400 font-normal">${escapeHtml(item.class_assigned)}</td>
+                  <td contenteditable="true" onblur="updateField(${index}, 'appt_date', this.innerText)" class="py-1 px-2 border border-slate-400 font-normal">${escapeHtml(item.appt_date)}</td>
+                  <td contenteditable="true" onblur="updateField(${index}, 'trained', this.innerText)" class="py-1 px-2 border border-slate-400 font-normal">${escapeHtml(item.trained)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+        container.insertAdjacentHTML("beforeend", tableHTML);
+      });
+    }
+
+    // Modal Operations
+    function openModal() {
+      document.getElementById("teacherModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("teacherModal").classList.add("hidden");
+      document.getElementById("teacherForm").reset();
+    }
+
+    // Add Teacher Logic
+    function handleAddTeacher(e) {
+      e.preventDefault();
+      const newTeacher = {
+        id: Date.now(),
+        name: document.getElementById("name").value,
+        father_spouse: document.getElementById("father_spouse").value,
+        dob: document.getElementById("dob").value,
+        acad_qual: document.getElementById("acad_qual").value,
+        prof_qual: document.getElementById("prof_qual").value,
+        exp: document.getElementById("exp").value,
+        class_assigned: document.getElementById("class_assigned").value,
+        appt_date: document.getElementById("appt_date").value,
+        trained: document.getElementById("trained").value
+      };
+
+      teachers.push(newTeacher);
+      render();
+      closeModal();
+    }
+
+    // Delete Teacher Logic
+    function deleteTeacher(index) {
+      teachers.splice(index, 1);
+      render();
+    }
+
+    // Dynamic Field Updates
+    function updateField(index, key, val) {
+      teachers[index][key] = val.trim();
+    }
+
+    // Clean Word Export Handler
+    function exportToWord() {
+      const headingText = escapeHtml(document.getElementById("docHeading").innerText);
+      const subHeadingText = escapeHtml(document.getElementById("docSubHeading").innerText);
+
+      let tablesHTML = "";
+
+      teachers.forEach((item, index) => {
+        tablesHTML += '<table border="1" style="width:100%; border-collapse:collapse; margin-bottom:15px; text-align:center; font-family:Arial, sans-serif; font-size:11pt;">' +
+          '<tr>' +
+            '<td rowspan="6" style="width:5%; text-align:center; vertical-align:top; padding-top:5px;">' + (index + 1) + '</td>' +
+            '<td style="width:31.6%; padding:4px;">Teacher Name</td>' +
+            '<td style="width:31.6%; padding:4px;">Father/Spouse Name</td>' +
+            '<td style="width:31.6%; padding:4px;">Date of Birth</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td style="padding:4px;">' + escapeHtml(item.name) + '</td>' +
+            '<td style="padding:4px;">' + escapeHtml(item.father_spouse) + '</td>' +
+            '<td style="padding:4px;">' + escapeHtml(item.dob) + '</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td style="padding:4px;">Academic Qualification</td>' +
+            '<td style="padding:4px;">Professional Qualifications</td>' +
+            '<td style="padding:4px;">Teaching Experience</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td style="padding:4px;">' + escapeHtml(item.acad_qual) + '</td>' +
+            '<td style="padding:4px;">' + escapeHtml(item.prof_qual) + '</td>' +
+            '<td style="padding:4px;">' + escapeHtml(item.exp) + '</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td style="padding:4px;">Class Assigned</td>' +
+            '<td style="padding:4px;">Appointment Date</td>' +
+            '<td style="padding:4px;">Trained or Untrained</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td style="padding:4px;">' + escapeHtml(item.class_assigned) + '</td>' +
+            '<td style="padding:4px;">' + escapeHtml(item.appt_date) + '</td>' +
+            '<td style="padding:4px;">' + escapeHtml(item.trained) + '</td>' +
+          '</tr>' +
+        '</table><br/>';
+      });
+
+      const docContent = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+        '<head><meta charset="utf-8"><title>Teaching Staff</title><style>body{font-family:Arial,sans-serif;} h2{font-size:14pt;font-weight:bold;margin-bottom:2px;} h3{font-size:12pt;font-weight:bold;margin-top:0px;margin-bottom:12px;}</style></head>' +
+        '<body>' +
+        '<h2>' + headingText + '</h2>' +
+        '<h3>' + subHeadingText + '</h3>' +
+        tablesHTML +
+        '</body></html>';
+
+      const blob = new Blob(['\ufeff', docContent], {
+        type: 'application/msword'
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Particulars_of_Teaching_Staff.doc';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Initial load
+    render();
+  </script>
+</body>
+</html>
